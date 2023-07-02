@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { TextInput as RNTextInput } from "react-native";
+import { TextInput as RNTextInput, Text } from "react-native";
 
 import globals from "../styles/globals";
 import { useColors, useStyle } from "../hooks/useStyle";
@@ -9,14 +9,19 @@ interface TextInputProps {
   onChangeText: (value: string) => void
   placeholder?: string
   invalid?: boolean
+  errorMessage?: string
+  as?: React.ComponentType<any>
 }
-
-export default function TextInput({
+const TextInput = React.forwardRef<RNTextInput, TextInputProps>(({
   value,
   onChangeText,
   placeholder,
   invalid = false,
-}: TextInputProps) {
+  errorMessage,
+  as = RNTextInput,
+}: TextInputProps,
+  ref
+) => {
   const style = useStyle()
   const colors = useColors()
   const defaultBorder = style.input.borderColor
@@ -34,19 +39,31 @@ export default function TextInput({
     }
   }, [invalid, focus])
 
+  const TextInputComponent = as
+
   return (
-    <RNTextInput
-      value={value}
-      onChangeText={onChangeText}
-      placeholder={placeholder}
+    <>
+      <TextInputComponent
+        ref={ref}
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
 
-      style={{
-        ...style.input,
-        borderColor,
-      }}
+        style={{
+          ...style.input,
+          borderColor,
+        }}
 
-      onFocus={() => setFocus(true)}
-      onBlur={() => setFocus(false)}
-    />
+        onFocus={() => setFocus(true)}
+        onBlur={() => setFocus(false)}
+      />
+      {
+        invalid && errorMessage ?
+          <Text style={{ color: colors.danger, opacity: .9, marginTop: 5 }}>{errorMessage}</Text> :
+          null
+      }
+    </>
   );
-}
+})
+
+export default TextInput;

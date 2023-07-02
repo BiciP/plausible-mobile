@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { shadowSm } from "./shadows";
+import { shadowMd, shadowSm } from "./shadows";
 import { ColorsPallete } from "./colors";
 
 export const createStyles = ({
@@ -63,7 +63,11 @@ export const createStyles = ({
 
       shadowSm: {
         ...shadowSm
-      }
+      },
+
+      shadowMd: {
+        ...shadowMd,
+      },
     }
   )
 }
