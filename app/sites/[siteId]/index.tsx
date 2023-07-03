@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, Text } from 'react-native'
-import { useSearchParams } from 'expo-router'
+import { Stack, useSearchParams } from 'expo-router'
 
 export default function SiteDashboard() {
   const { siteId } = useSearchParams()
@@ -14,9 +14,16 @@ export default function SiteDashboard() {
   }
 
   return (
-    <View>
-      <Text>Site Dashboard</Text>
-      <Text>Site ID: {siteId}</Text>
-    </View>
+    <>
+      <Stack.Screen 
+        options={{
+          title: siteId as string,
+        }}
+      />
+      <View>
+        <Text>Site Dashboard</Text>
+        <Text>Site ID: {siteId}</Text>
+      </View>
+    </>
   )
 }

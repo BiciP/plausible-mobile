@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, Stack, useRouter } from "expo-router";
 import { View, Text, Pressable, StyleSheet, Platform, useColorScheme, useWindowDimensions } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { FlatList, RectButton } from "react-native-gesture-handler";
+import { SafeAreaView, SafeAreaInsetsContext } from "react-native-safe-area-context";
+import { BorderlessButton, FlatList, RectButton } from "react-native-gesture-handler";
 import { LineChart } from 'react-native-wagmi-charts';
 import * as haptics from 'expo-haptics';
 import { DateTime } from "luxon";
@@ -14,6 +14,7 @@ import AddWebsite from "../components/AddWebsite";
 import { getSites } from "../utils/websiteManager";
 import { useAxios } from "../hooks/useAxios";
 import { useInterval } from "../hooks/useInterval";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const GRAPH_HEIGHT = 120
 
@@ -22,7 +23,8 @@ function invokeHaptic() {
 }
 
 export default function Index() {
-  const { apiKey, setApiKey } = useApiContext()
+  const { apiKey } = useApiContext()
+  const insets = React.useContext(SafeAreaInsetsContext);
   const colorScheme = useColorScheme()
   const windowDimensions = useWindowDimensions()
   const router = useRouter();
@@ -89,7 +91,6 @@ export default function Index() {
         }
       })
 
-      console.log(`[LIVE] ${site}: ${res.data}`)
       if (newSiteData[site] == null) {
         newSiteData[site] = {
           live: res.data,
@@ -122,12 +123,23 @@ export default function Index() {
     <>
       <Stack.Screen
         options={{
-          headerShown: false,
+          title: 'Websites',
+          headerRight: () => (
+            <BorderlessButton onPress={() => {
+              router.push('/settings')
+            }}>
+              <Ionicons
+                name={ Platform.OS === 'ios' ? 'ios-cog' : 'md-cog' }
+                size={24}
+                color={colors.text}
+              />
+            </BorderlessButton>
+          ),
         }}
       />
 
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-        <View style={style.page}>
+        <View style={{...style.page, marginTop: 20}}>
           <View style={{
             marginHorizontal: -20,
             flex: 1,
@@ -247,7 +259,7 @@ export default function Index() {
             onAdd={(site) => { }}
           />
         </View>
-      </SafeAreaView >
+      </SafeAreaView>
     </>
   )
 }
