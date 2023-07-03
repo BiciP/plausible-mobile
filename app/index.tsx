@@ -129,7 +129,7 @@ export default function Index() {
               router.push('/settings')
             }}>
               <Ionicons
-                name={ Platform.OS === 'ios' ? 'ios-cog' : 'md-cog' }
+                name={Platform.OS === 'ios' ? 'ios-cog' : 'md-cog'}
                 size={24}
                 color={colors.text}
               />
@@ -139,14 +139,14 @@ export default function Index() {
       />
 
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-        <View style={{...style.page, marginTop: 20}}>
+        <View style={{ ...style.page, marginTop: 20 }}>
           <View style={{
             marginHorizontal: -20,
             flex: 1,
           }}>
             <FlatList
               onRefresh={() => {
-                console.log('refresh')
+                // TODO: implement refreshing
               }}
               data={sites}
               style={{
@@ -156,20 +156,22 @@ export default function Index() {
               }}
               renderItem={({ item }) => {
                 return (
-                  <View style={{
-                    backgroundColor: colors.secondaryBackground,
-                    borderRadius: 10,
+                  <BorderlessButton
+                    style={{
+                      backgroundColor: colors.secondaryBackground,
+                      borderRadius: 10,
 
-                    ...(
-                      colorScheme === 'light' ?
-                        style.shadowMd
-                        : null
-                    ),
-                  }}>
-                    <RectButton
-                      onPress={() => {
-                        router.push(`/sites/${item}`)
-                      }}
+                      ...(
+                        colorScheme === 'light' ?
+                          style.shadowMd
+                          : null
+                      ),
+                    }}
+                    onPress={() => {
+                      router.push(`/sites/${item}`)
+                    }}
+                  >
+                    <View
                       style={{
                         paddingTop: 20,
                         paddingHorizontal: 20,
@@ -210,7 +212,7 @@ export default function Index() {
                           color={'green'}
                         />
                       </View>
-                    </RectButton>
+                    </View>
 
                     <View style={{
                       height: GRAPH_HEIGHT,
@@ -237,19 +239,13 @@ export default function Index() {
                                 width={windowDimensions.width - 40}
                               >
                                 <LineChart.Path color={colors.primary} />
-                                <LineChart.CursorCrosshair
-                                  onActivated={invokeHaptic}
-                                  onEnded={invokeHaptic}
-                                >
-                                  <LineChart.Tooltip position="top" />
-                                </LineChart.CursorCrosshair>
                               </LineChart>
                             </LineChart.Group>
                           </LineChart.Provider>
                           : null
                       }
                     </View>
-                  </View>
+                  </BorderlessButton>
                 )
               }}
             />
