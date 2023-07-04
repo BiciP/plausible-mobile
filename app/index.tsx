@@ -15,8 +15,7 @@ import { getSites } from "../utils/websiteManager";
 import { useAxios } from "../hooks/useAxios";
 import { useInterval } from "../hooks/useInterval";
 import Ionicons from "@expo/vector-icons/Ionicons";
-
-const GRAPH_HEIGHT = 120
+import SiteCard from "../components/SiteCard";
 
 function invokeHaptic() {
   haptics.impactAsync(haptics.ImpactFeedbackStyle.Light);
@@ -154,100 +153,12 @@ export default function Index() {
                 paddingVertical: 10,
                 flex: 1,
               }}
-              renderItem={({ item }) => {
-                return (
-                  <BorderlessButton
-                    style={{
-                      backgroundColor: colors.secondaryBackground,
-                      borderRadius: 10,
-
-                      ...(
-                        colorScheme === 'light' ?
-                          style.shadowMd
-                          : null
-                      ),
-                    }}
-                    onPress={() => {
-                      router.push(`/sites/${item}`)
-                    }}
-                  >
-                    <View
-                      style={{
-                        paddingTop: 20,
-                        paddingHorizontal: 20,
-                        paddingBottom: 10,
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      <Text style={{
-                        color: colors.text,
-                        fontSize: 18,
-                      }}>
-                        {item}
-                      </Text>
-
-                      <View style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                      }}>
-                        <Text style={{
-                          color: colors.text,
-                          fontWeight: 'bold',
-                        }}>
-                          {
-                            new Intl
-                              // for some reason, compact notation doesn't work
-                              .NumberFormat('en', { notation: 'compact' })
-                              .format(
-                                siteData[item]?.live || 0
-                              )
-                          }
-                        </Text>
-                        <PulseIndicator
-                          size={14}
-                          style={{
-                            marginLeft: 10,
-                          }}
-                          color={'green'}
-                        />
-                      </View>
-                    </View>
-
-                    <View style={{
-                      height: GRAPH_HEIGHT,
-                    }}>
-                      {
-                        siteData[item]?.current && siteData[item]?.previous ?
-                          <LineChart.Provider
-                            data={{
-                              one: siteData[item]?.current,
-                              two: siteData[item]?.previous,
-                            }}
-                          >
-                            <LineChart.Group>
-                              <LineChart
-                                id="two"
-                                height={GRAPH_HEIGHT}
-                                width={windowDimensions.width - 40}
-                              >
-                                <LineChart.Path color={'#888'} />
-                              </LineChart>
-                              <LineChart
-                                id="one"
-                                height={GRAPH_HEIGHT}
-                                width={windowDimensions.width - 40}
-                              >
-                                <LineChart.Path color={colors.primary} />
-                              </LineChart>
-                            </LineChart.Group>
-                          </LineChart.Provider>
-                          : null
-                      }
-                    </View>
-                  </BorderlessButton>
-                )
-              }}
+              renderItem={({ item }) => (
+                <SiteCard
+                  origin={item}
+                  siteData={siteData[item]}
+                />
+              )}
             />
           </View>
 
