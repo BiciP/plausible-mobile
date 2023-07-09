@@ -4,7 +4,9 @@ import { useColors, useStyle } from "../../hooks/useStyle";
 import { Stack } from "expo-router";
 import { View, Text, SafeAreaView, Keyboard } from "react-native";
 import { useCallback, useEffect, useState } from "react";
-import { BorderlessButton, RectButton, TouchableWithoutFeedback } from "react-native-gesture-handler";
+import { RectButton, TouchableWithoutFeedback } from "react-native-gesture-handler";
+import { useAtom } from "jotai";
+import { requestsAtom } from "../../store";
 
 export default function Settings() {
   const colors = useColors()
@@ -12,6 +14,8 @@ export default function Settings() {
 
   const { apiKey, setApiKey } = useApiContext()
   const [apiKeyInput, setApiKeyInput] = useState<string>("")
+
+  const [requests] = useAtom(requestsAtom)
 
   const handleSaveAPIKey = useCallback(() => {
     setApiKey(apiKeyInput)
@@ -53,6 +57,21 @@ export default function Settings() {
                     Save API Key
                   </Text>
                 </RectButton>
+              </View>
+            </View>
+
+            <View style={{ marginTop: 20 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Text style={{ color: colors.text, fontSize: 18, fontWeight: 'bold' }}>
+                  Usage
+                </Text>
+                <Text style={{ opacity: .75 }}>
+                  {requests.length} / 600
+                </Text>
+              </View>
+
+              <View style={{ position: 'relative', height: 20, backgroundColor: '#eee', marginTop: 10, borderRadius: 10, overflow: 'hidden' }}>
+                <View style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: `${requests.length / 600 * 100}%`, backgroundColor: colors.primary, opacity: .75 }} />
               </View>
             </View>
 

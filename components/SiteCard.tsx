@@ -86,12 +86,21 @@ export default function SiteCard({ origin, siteData }: SiteCardProps) {
                 one: siteData.current,
                 two: siteData.previous,
               }}
+              yRange={{
+                min: 0,
+                // this moves the graph line to the bottom of the graph if there are no visitors
+                // otherwise, the graph line will be in the middle of the graph which looks weird
+                max: Math.max(
+                  siteData.current.reduce((curMax, point) => Math.max(curMax, point.value), 1),
+                  siteData.previous.reduce((curMax, point) => Math.max(curMax, point.value), 1)
+                )
+              }}
             >
               <LineChart.Group>
                 <LineChart
                   id="two"
                   height={GRAPH_HEIGHT}
-                  width={windowDimensions.width - 40}
+                  width={windowDimensions.width - 20}
                   shape={Linear}
                 >
                   <LineChart.Path
@@ -102,7 +111,7 @@ export default function SiteCard({ origin, siteData }: SiteCardProps) {
                 <LineChart
                   id="one"
                   height={GRAPH_HEIGHT}
-                  width={windowDimensions.width - 40}
+                  width={windowDimensions.width - 20}
                   shape={Linear}
                 >
                   <LineChart.Path

@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { shadowMd, shadowSm } from "./shadows";
+import { shadowMd, shadowSm, shadowMid } from "./shadows";
 import { ColorsPallete } from "./colors";
 
 export const createStyles = ({
@@ -11,7 +11,8 @@ export const createStyles = ({
     {
       page: {
         flex: 1,
-        padding: 20,
+        paddingVertical: 20,
+        paddingHorizontal: 10,
         backgroundColor: colors.background,
       },
 
@@ -63,6 +64,10 @@ export const createStyles = ({
 
       shadowSm: {
         ...shadowSm
+      },
+
+      shadowMid: {
+        ...shadowMid
       },
 
       shadowMd: {

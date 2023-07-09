@@ -17,6 +17,7 @@
         "backgroundColor": "#ffffff",
         "dark": {
           "backgroundColor": "#1a202c",
+          "resizeMode": "contain",
           "image": "./assets/splash-dark.png"
         }
       }
@@ -32,6 +33,7 @@
         "backgroundColor": "#ffffff",
         "dark": {
           "backgroundColor": "#1a202c",
+          "resizeMode": "contain",
           "image": "./assets/splash-dark.png"
         }
       }

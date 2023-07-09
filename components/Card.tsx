@@ -4,6 +4,7 @@ import { View, useColorScheme } from "react-native"
 interface CardProps {
   as?: React.ElementType
   children?: React.ReactNode | React.ReactNode[] | string
+  shadow?: any
   [key: string]: any
 }
 
@@ -23,9 +24,11 @@ export default function Card({ as, children, ...props }: CardProps) {
 
         ...(
           colorScheme === 'light' ?
-            style.shadowMd
+            props.shadow || style.shadowMd
             : null
         ),
+        
+        ...props.style,
       }}
     >
       {children}

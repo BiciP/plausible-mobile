@@ -16,6 +16,8 @@ import { useAxios } from "../hooks/useAxios";
 import { useInterval } from "../hooks/useInterval";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import SiteCard from "../components/SiteCard";
+import { useAtom } from "jotai";
+import { pagesAtom } from "../store";
 
 function invokeHaptic() {
   haptics.impactAsync(haptics.ImpactFeedbackStyle.Light);
@@ -32,74 +34,61 @@ export default function Index() {
   const axios = useAxios()
 
   const [sites, setSites] = useState<string[]>([])
-  const [siteData, setSiteData] = useState<{ [key: string]: any }>({})
+  const [pages, setPages] = useAtom(pagesAtom)
   const [reloading, setReloading] = useState<boolean>(false)
 
   const fetchhSites = async () => {
     let siteData: { [key: string]: any } = {}
 
     for (const site of sites) {
-      const res = await axios.get('/api/v1/stats/timeseries', {
-        params: {
-          site_id: site,
-          period: '7d',
-        }
-      })
-
-      const prev = await axios.get('/api/v1/stats/timeseries', {
-        params: {
-          site_id: site,
-          period: '7d',
-          date: DateTime.now().minus({ days: 7 }).toFormat('yyyy-MM-dd')
-        }
-      })
-
-      const live = await axios.get('/api/v1/stats/realtime/visitors', {
-        params: {
-          site_id: site,
-        }
-      })
-
-      siteData[site] = {
-        live: live.data,
-        current: res.data.results.map((result: any) => {
-          return {
-            timestamp: new Date(result.date).getTime(),
-            value: result.visitors,
-          }
-        }),
-        previous: prev.data.results.map((result: any) => {
-          return {
-            timestamp: new Date(result.date).getTime(),
-            value: result.visitors,
+      try {
+        const res = await axios.get('/api/v1/stats/timeseries', {
+          params: {
+            site_id: site,
+            period: '7d',
           }
         })
+
+        const prev = await axios.get('/api/v1/stats/timeseries', {
+          params: {
+            site_id: site,
+            period: '7d',
+            date: DateTime.now().minus({ days: 7 }).toFormat('yyyy-MM-dd')
+          }
+        })
+
+        const live = await axios.get('/api/v1/stats/realtime/visitors', {
+          params: {
+            site_id: site,
+          }
+        })
+
+        siteData[site] = {
+          live: live.data,
+          current: res.data.results.map((result: any) => {
+            return {
+              timestamp: new Date(result.date).getTime(),
+              value: result.visitors,
+            }
+          }),
+          previous: prev.data.results.map((result: any) => {
+            return {
+              timestamp: new Date(result.date).getTime(),
+              value: result.visitors,
+            }
+          })
+        }
+      } catch(err) {
+        console.log(err)
+        siteData[site] = {
+          live: 0,
+          current: [{ timestamp: 0, value: 0 }],
+          previous: [{ timestamp: 0, value: 0}],
+        }
       }
     }
 
-    setSiteData(siteData)
-  }
-
-  const fetchLive = async () => {
-    let newSiteData: { [key: string]: any } = JSON.parse(JSON.stringify(siteData))
-
-    for (const site of sites) {
-      const res = await axios.get('/api/v1/stats/realtime/visitors', {
-        params: {
-          site_id: site,
-        }
-      })
-
-      if (newSiteData[site] == null) {
-        newSiteData[site] = {
-          live: res.data,
-        }
-      } else {
-        newSiteData[site].live = res.data
-      }
-    }
-
-    setSiteData(newSiteData)
+    setPages(siteData)
   }
 
   useEffect(() => {
@@ -108,8 +97,8 @@ export default function Index() {
   }, [sites, apiKey])
 
   useInterval(() => {
-    fetchLive()
-  }, 1000 * 10)
+    fetchhSites()
+  }, 1000 * 60 * 1)
 
   useEffect(() => {
     (async () => {
@@ -156,9 +145,10 @@ export default function Index() {
               renderItem={({ item }) => (
                 <SiteCard
                   origin={item}
-                  siteData={siteData[item]}
+                  siteData={pages[item]}
                 />
               )}
+              ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
             />
           </View>
 
