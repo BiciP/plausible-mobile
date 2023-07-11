@@ -2,11 +2,12 @@ import { useApiContext } from "../../context/auth";
 import TextInput from "../../components/TextInput";
 import { useColors, useStyle } from "../../hooks/useStyle";
 import { Stack } from "expo-router";
-import { View, Text, SafeAreaView, Keyboard } from "react-native";
+import { View, Text, SafeAreaView, Keyboard, Linking } from "react-native";
 import { useCallback, useEffect, useState } from "react";
-import { RectButton, TouchableWithoutFeedback } from "react-native-gesture-handler";
+import { BorderlessButton, RectButton, TouchableWithoutFeedback } from "react-native-gesture-handler";
 import { useAtom } from "jotai";
 import { requestsAtom } from "../../store";
+import URLButton from "../../components/URLButton";
 
 export default function Settings() {
   const colors = useColors()
@@ -73,11 +74,38 @@ export default function Settings() {
               <View style={{ position: 'relative', height: 20, backgroundColor: '#eee', marginTop: 10, borderRadius: 10, overflow: 'hidden' }}>
                 <View style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: `${requests.length / 600 * 100}%`, backgroundColor: colors.primary, opacity: .75 }} />
               </View>
+
+              <Text style={{ color: colors.text, opacity: .75, marginTop: 5, textAlign: 'justify' }}>
+                This limit is set by Plausible Analytics. We try to track your usage to keep you informed, but it may not be 100% accurate. If you hit the limit, the app might not work for about an hour.
+              </Text>
             </View>
+
+            <BorderlessButton
+              style={{
+                backgroundColor: "#FD0",
+                padding: 15,
+                borderRadius: 12,
+                alignItems: 'center',
+                width: '75%',
+                alignSelf: 'center',
+                marginTop: 'auto',
+              }}
+              onPress={async () => {
+                await Linking.openURL("https://www.buymeacoffee.com/andrazPolajzer")
+              }}
+            >
+              <Text style={{
+                color: "#000",
+                fontSize: 18,
+              }}>
+                ☕ Buy Me a Coffee
+              </Text>
+            </BorderlessButton>
 
             <View style={{
               opacity: .5,
-              marginTop: 'auto'
+              marginTop: 20,
+              alignItems: 'center',
             }}>
               <Text style={{ color: colors.text }}>
                 Version {require('../../package.json').version}
@@ -85,6 +113,7 @@ export default function Settings() {
               <Text style={{ color: colors.text }}>
                 Plausible Analytics Mobile App
               </Text>
+              <URLButton url="https://github.com/BiciP/plausible-mobile">View on GitHub</URLButton>
             </View>
           </View>
         </TouchableWithoutFeedback>

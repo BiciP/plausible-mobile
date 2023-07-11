@@ -1,6 +1,7 @@
 import { Linking, Text } from "react-native";
 
 import { useColors } from "../hooks/useStyle";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 interface URLButtonProps {
   url: string
@@ -15,6 +16,8 @@ export default function URLButton({ url, children }: URLButtonProps) {
   }
 
   return (
-    <Text style={{ color: colors.primary }} onPress={openURL}>{children}</Text>
+    <TouchableOpacity onPress={openURL}>
+      <Text style={{ color: colors.primary, alignSelf: 'baseline' }}>{children}</Text>
+    </TouchableOpacity>
   )
 }
