@@ -7,7 +7,7 @@ import { useColors, useStyle } from '../../../hooks/useStyle'
 import { RefreshControl, ScrollView } from 'react-native-gesture-handler'
 import { useAxios } from '../../../hooks/useAxios'
 import { DateTime } from 'luxon'
-import { LineChart } from 'react-native-wagmi-charts'
+import { LineChart, useLineChart, useLineChartPrice } from 'react-native-wagmi-charts'
 import Linear from '../../../utils/shape/linear'
 import StatSectionCard from '../../../components/StatSectionCard'
 import { createIntlCache } from 'react-intl'
@@ -190,13 +190,13 @@ export default function SiteDashboard() {
       setTimeseries(current.data.results.map((result: any) => {
         return {
           timestamp: new Date(result.date).getTime(),
-          value: result[activeStat as string],
+          value: result[activeStat as string] || 0,
         }
       }))
       setTimeseriesPrev(prev.data.results.map((result: any) => {
         return {
           timestamp: new Date(result.date).getTime(),
-          value: result[activeStat as string],
+          value: result[activeStat as string] || 0,
         }
       }))
     } catch (err: any) {
@@ -376,13 +376,15 @@ export default function SiteDashboard() {
                     }
                   </LineChart.Path>
                   <LineChart.CursorCrosshair>
-                    <LineChart.Tooltip>
-                      <View>
-                        <Text style={{ ...style.text, fontSize: 12, fontWeight: 'bold', color: colors.text }}>
-                          Hello
-                        </Text>
-                      </View>
-                    </LineChart.Tooltip>
+                    <LineChart.Tooltip
+                      textStyle={{
+                        color: "#fff"
+                      }}
+                      style={{
+                        backgroundColor: colors.primary,
+                        borderRadius: 4,
+                      }}
+                    />
                   </LineChart.CursorCrosshair>
                 </LineChart>
               </LineChart.Group>

@@ -32,7 +32,7 @@ export default function StatSectionCard({ metric, title, items }: StatSectionCar
 
       <View style={{ rowGap: 6 }}>
         {
-          items.slice(0, 5).map(item => (
+          items.map(item => (
             <View
               key={item.title}
               style={{
@@ -65,6 +65,15 @@ export default function StatSectionCard({ metric, title, items }: StatSectionCar
               </Text>
             </View>
           ))
+        }
+        {
+          items.length === 0 && (
+            <View>
+              <Text style={{ ...style.title, fontSize: 20, opacity: .5 }}>
+                No data
+              </Text>
+            </View>
+          )
         }
       </View>
     </Card>
