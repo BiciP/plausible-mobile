@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react'
-import { View, Text } from 'react-native'
+import React, { useEffect, useMemo } from 'react'
+import { View, Text, useColorScheme } from 'react-native'
 import { Stack, useSearchParams } from 'expo-router'
 import StatCard from '../../../components/StatCard'
 import { SafeAreaInsetsContext, SafeAreaView } from 'react-native-safe-area-context'
@@ -68,6 +68,7 @@ const intl = createIntl(
 )
 
 export default function SiteDashboard() {
+  const colorScheme = useColorScheme();
   const colors = useColors()
   const style = useStyle()
   const axios = useAxios()
@@ -75,6 +76,7 @@ export default function SiteDashboard() {
 
   const { siteId } = useSearchParams()
 
+  const [loading, setLoading] = React.useState(false)
   const [activeStat, setActiveStat] = React.useState<PlausibleMetrics>('visitors')
   const [refreshing, setRefreshing] = React.useState(false)
 
@@ -98,6 +100,8 @@ export default function SiteDashboard() {
   // Fetch aggregate stats, and timeseries data for the selected datapoint 
   const fetchData = async () => {
     try {
+      setLoading(true)
+
       const current = await axios.get('/api/v1/stats/aggregate', {
         params: {
           site_id: siteId,
@@ -159,6 +163,8 @@ export default function SiteDashboard() {
       setDevicesBreakdown(devicesBreakdownResp.data.results)
     } catch (err: any) {
       console.log(err.response.data)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -198,6 +204,14 @@ export default function SiteDashboard() {
     }
   }
 
+  const maxValue = useMemo(() => {
+    return Math.max(...timeseries.map(item => item.value), ...timeseriesPrev.map(item => item.value))
+  }, [timeseries, timeseriesPrev])
+
+  const gridStep = useMemo(() => {
+    return Math.max(1, Math.ceil(maxValue / 5))
+  }, [maxValue])
+
   useEffect(() => {
     if (!siteId) return
     fetchData()
@@ -212,14 +226,6 @@ export default function SiteDashboard() {
     return (
       <View>
         <Text>Missing site ID</Text>
-      </View>
-    )
-  }
-
-  if (!timeseries || !timeseriesPrev) {
-    return (
-      <View>
-        <Text>Loading...</Text>
       </View>
     )
   }
@@ -347,7 +353,6 @@ export default function SiteDashboard() {
                     width={2}
                     color={'#888'}
                   />
-                  <LineChart.CursorCrosshair></LineChart.CursorCrosshair>
                 </LineChart>
                 <LineChart
                   id="one"
@@ -357,13 +362,34 @@ export default function SiteDashboard() {
                   <LineChart.Path
                     width={2}
                     color={colors.primary}
-                  />
+                  >
+                    {
+                      Array(Math.ceil((maxValue || 1) / gridStep + 1)).fill(0).map((_, i) => {
+                        return (
+                          <LineChart.HorizontalLine
+                            key={i}
+                            at={{ value: i * gridStep }}
+                            color={colorScheme === 'light' ? '#ddd' : '#444'}
+                          />
+                        )
+                      })
+                    }
+                  </LineChart.Path>
+                  <LineChart.CursorCrosshair>
+                    <LineChart.Tooltip>
+                      <View>
+                        <Text style={{ ...style.text, fontSize: 12, fontWeight: 'bold', color: colors.text }}>
+                          Hello
+                        </Text>
+                      </View>
+                    </LineChart.Tooltip>
+                  </LineChart.CursorCrosshair>
                 </LineChart>
               </LineChart.Group>
             </LineChart.Provider>
           </View>
 
-          <View style={{ rowGap: 10 }}>
+          <View style={{ rowGap: 10, opacity: loading ? 0 : 1 }}>
             <StatSectionCard
               metric={activeStat}
               title="Top sources"

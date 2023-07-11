@@ -65,7 +65,7 @@ export default function Settings() {
                 <Text style={{ color: colors.text, fontSize: 18, fontWeight: 'bold' }}>
                   Usage
                 </Text>
-                <Text style={{ opacity: .75 }}>
+                <Text style={{ color: colors.text, opacity: .75 }}>
                   {requests.length} / 600
                 </Text>
               </View>
