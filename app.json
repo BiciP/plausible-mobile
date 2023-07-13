@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "plausible-app",
+    "name": "Staat",
     "slug": "plausible-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -20,7 +20,8 @@
           "resizeMode": "contain",
           "image": "./assets/splash-dark.png"
         }
-      }
+      },
+      "bundleIdentifier": "com.bicip.plausibleapp"
     },
     "android": {
       "adaptiveIcon": {
@@ -46,5 +47,10 @@
       "tsconfigPaths": true
     },
     "scheme": "plausible-app",
+    "extra": {
+      "eas": {
+        "projectId": "11f2d76a-dfcc-4973-9f13-27a7ace7579a"
+      }
+    }
   }
 }

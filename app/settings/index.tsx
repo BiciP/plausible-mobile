@@ -108,12 +108,12 @@ export default function Settings() {
               alignItems: 'center',
             }}>
               <Text style={{ color: colors.text }}>
-                Version {require('../../package.json').version}
-              </Text>
-              <Text style={{ color: colors.text }}>
-                Plausible Analytics Mobile App
+                Staat • {require('../../package.json').version}
               </Text>
               <URLButton url="https://github.com/BiciP/plausible-mobile">View on GitHub</URLButton>
+              <Text style={{ color: colors.text, marginTop: 10 }}>
+                Not affiliated with Plausible Analytics
+              </Text>
             </View>
           </View>
         </TouchableWithoutFeedback>
