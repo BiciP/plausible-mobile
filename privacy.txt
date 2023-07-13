@@ -1,0 +1,35 @@
+Privacy Policy
+
+Effective Date: 7/13/2023
+
+Thank you for using Staat (the "App"). This Privacy Policy explains how we collect, use, and protect your personal information when you use our iOS app.
+
+1. Information We Don't Collect
+We are committed to respecting your privacy and ensuring the confidentiality of your personal information. Our App does not collect any personal data or personally identifiable information from you. We do not track, store, or transmit any information that can be used to personally identify you.
+
+2. Non-Personal Information
+The App may collect non-personal information such as device information (e.g., device model, operating system version) and usage statistics (e.g., number of app launches, interactions within the app) for the sole purpose of improving the performance, functionality, and user experience of the App. This information is collected in a way that does not personally identify you and is used in an aggregated and anonymous form.
+
+3. Advertising
+We do not display any advertisements within the App. Therefore, your usage of the App is not subject to any targeted advertising or third-party tracking.
+
+4. Third-Party Services
+Our App does not integrate with any third-party services or APIs that would require the transfer of your personal information.
+
+5. Children's Privacy
+We do not knowingly collect personal information from children under the age of 13. If you are a parent or guardian and believe that your child has provided personal information through the App, please contact us, and we will promptly delete such information from our records.
+
+6. Security
+We take reasonable measures to protect the information collected by the App from loss, theft, misuse, unauthorized access, disclosure, alteration, or destruction. However, please note that no method of transmission over the internet or method of electronic storage is 100% secure. Therefore, we cannot guarantee the absolute security of your information.
+
+7. Changes to This Privacy Policy
+We reserve the right to modify this Privacy Policy at any time. Any changes we make will be effective immediately upon posting an updated version of the Privacy Policy in the App. Your continued use of the App after the posting of the updated Privacy Policy constitutes your acceptance of the changes.
+
+8. Contact Us
+If you have any questions or concerns about this Privacy Policy or our privacy practices, please contact us at [email address].
+
+By using the App, you signify your consent to the terms of this Privacy Policy. If you do not agree with the practices described in this Privacy Policy, please do not use the App.
+
+Please note that this Privacy Policy applies only to the App and not to any third-party websites or services that may be linked to within the App.
+
+Thank you for your trust in our commitment to privacy.
