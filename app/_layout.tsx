@@ -7,12 +7,11 @@ import * as Font from 'expo-font';
 import { Asset } from 'expo-asset';
 import { SplashScreen } from "expo-router";
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { BlurView } from 'expo-blur';
-import { BorderlessButton, RectButton, ScrollView } from "react-native-gesture-handler";
-
 import { ApiProvider } from "../context/auth";
 import { useColors } from "../hooks/useStyle";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import RangePicker from "../components/RangePicker";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import RangeModal from "../components/RangeModal";
 
 const cacheFonts = (fonts: any) => fonts.map((font: any) => Font.loadAsync(font));
 
@@ -58,16 +57,21 @@ export default function AppLayout() {
 
   return (
     <ApiProvider>
-      <StatusBar />
+      <BottomSheetModalProvider>
+        <StatusBar />
 
-      <Stack
-        screenOptions={{
-          headerTransparent: true,
-          headerBlurEffect: 'systemUltraThinMaterial',
-          headerTintColor: colors.text
-        }}
-        initialRouteName="index"
-      />
+        <Stack
+          screenOptions={{
+            headerTransparent: true,
+            headerBlurEffect: 'systemUltraThinMaterial',
+            headerTintColor: colors.text,
+            headerRight: RangePicker
+          }}
+          initialRouteName="index"
+        />
+
+        <RangeModal />
+      </BottomSheetModalProvider>
     </ApiProvider>
   );
 }

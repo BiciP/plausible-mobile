@@ -49,6 +49,7 @@ export default function Settings() {
       <Stack.Screen
         options={{
           title: 'Settings',
+          headerRight: () => null
         }}
       />
 

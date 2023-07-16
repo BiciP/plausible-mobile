@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo } from 'react'
-import { View, Text, useColorScheme, Dimensions, Animated } from 'react-native'
+import React, { useCallback, useEffect, useMemo } from 'react'
+import { View, Text, useColorScheme, Dimensions, Animated, ActivityIndicator, StyleSheet } from 'react-native'
 import { Stack, useSearchParams } from 'expo-router'
 import StatCard from '../../../components/StatCard'
 import { SafeAreaInsetsContext, SafeAreaView } from 'react-native-safe-area-context'
 import { useColors, useStyle } from '../../../hooks/useStyle'
-import { RefreshControl, ScrollView } from 'react-native-gesture-handler'
+import { BorderlessButton, RefreshControl, ScrollView } from 'react-native-gesture-handler'
 import { useAxios } from '../../../hooks/useAxios'
 import { DateTime } from 'luxon'
 import { LineChart, useLineChart, useLineChartPrice } from 'react-native-wagmi-charts'
@@ -16,8 +16,11 @@ import PagerView, { PagerViewOnPageScrollEventData } from 'react-native-pager-vi
 import {
   SlidingDot,
 } from 'react-native-animated-pagination-dots';
-
 import getCountryFlag from 'country-flag-icons/unicode'
+import RangePicker from '../../../components/RangePicker'
+import { useAtomValue } from 'jotai'
+import { rangeAtom } from '../../../store/range'
+import { rangeToPlausiblePeriod } from '../../../utils/rangeHelper'
 
 type ValueObject<T> = {
   value: T
@@ -73,6 +76,8 @@ const intl = createIntl(
 const AnimatedPagerView = Animated.createAnimatedComponent(PagerView);
 
 export default function SiteDashboard() {
+  const range = useAtomValue(rangeAtom)
+
   const colorScheme = useColorScheme();
   const colors = useColors()
   const style = useStyle()
@@ -81,9 +86,9 @@ export default function SiteDashboard() {
 
   const { siteId } = useSearchParams()
 
-  const [loading, setLoading] = React.useState(false)
+  const [loadingAggregated, setLoadingAggregated] = React.useState(false)
+  const [loadingTimeseries, setLoadingTimeseries] = React.useState(false)
   const [activeStat, setActiveStat] = React.useState<PlausibleMetrics>('visitors')
-  const [refreshing, setRefreshing] = React.useState(false)
 
   const [aggregate, setAggregate] = React.useState<PlausibleAggregateStats | null>(null)
   const [aggregatePrev, setAggregatePrev] = React.useState<PlausibleAggregateStats | null>(null)
@@ -109,21 +114,39 @@ export default function SiteDashboard() {
     outputRange: [0, 4 * width],
   });
 
-  const refreshData = async () => {
-    setRefreshing(true)
-    await fetchData()
-    setRefreshing(false)
-  }
+  const plausibleParams = useMemo(() => {
+    let period = rangeToPlausiblePeriod[range]
+    let curDate = DateTime.now()
+    let prevDate
+
+    if (range === '7days') {
+      prevDate = DateTime.now().minus({ days: 7 })
+    } else if (range === '30days') {
+      prevDate = DateTime.now().minus({ days: 30 })
+    } else if (range === 'lastmonth') {
+      curDate = DateTime.now().minus({ month: 1 }).startOf('month')
+      prevDate = DateTime.now().minus({ month: 2 }).startOf('month')
+    } else if (range === 'last12months') {
+      prevDate = DateTime.now().minus({ month: 12 })
+    }
+
+    return {
+      period,
+      curDate: curDate.toFormat('yyyy-MM-dd'),
+      prevDate: prevDate?.toFormat('yyyy-MM-dd')
+    }
+  }, [range])
 
   // Fetch aggregate stats, and timeseries data for the selected datapoint 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
-      setLoading(true)
+      setLoadingAggregated(true)
 
       const current = await axios.get('/api/v1/stats/aggregate', {
         params: {
           site_id: siteId,
-          period: '7d',
+          period: plausibleParams.period,
+          date: plausibleParams.curDate,
           metrics: ['visitors', 'visits', 'pageviews', 'views_per_visit', 'bounce_rate', 'visit_duration', 'events'].join(','),
         }
       })
@@ -131,8 +154,8 @@ export default function SiteDashboard() {
       const prev = await axios.get('/api/v1/stats/aggregate', {
         params: {
           site_id: siteId,
-          period: '7d',
-          date: DateTime.now().minus({ days: 7 }).toFormat('yyyy-MM-dd'),
+          period: plausibleParams.period,
+          date: plausibleParams.prevDate,
           metrics: ['visitors', 'visits', 'pageviews', 'views_per_visit', 'bounce_rate', 'visit_duration', 'events'].join(','),
         }
       })
@@ -140,7 +163,8 @@ export default function SiteDashboard() {
       const sourcesBreakdownResp = await axios.get('/api/v1/stats/breakdown', {
         params: {
           site_id: siteId,
-          period: '7d',
+          period: plausibleParams.period,
+          date: plausibleParams.curDate,
           metrics: ['visitors', 'visits', 'pageviews', 'bounce_rate', 'visit_duration', 'events'].join(','),
           property: 'visit:source'
         }
@@ -149,7 +173,8 @@ export default function SiteDashboard() {
       const pagesBreakdownResp = await axios.get('/api/v1/stats/breakdown', {
         params: {
           site_id: siteId,
-          period: '7d',
+          period: plausibleParams.period,
+          date: plausibleParams.curDate,
           metrics: ['visitors', 'visits', 'pageviews', 'bounce_rate', 'visit_duration', 'events'].join(','),
           property: 'event:page'
         }
@@ -158,7 +183,8 @@ export default function SiteDashboard() {
       const countriesBreakdownResp = await axios.get('/api/v1/stats/breakdown', {
         params: {
           site_id: siteId,
-          period: '7d',
+          period: plausibleParams.period,
+          date: plausibleParams.curDate,
           metrics: ['visitors', 'visits', 'pageviews', 'bounce_rate', 'visit_duration', 'events'].join(','),
           property: 'visit:country'
         }
@@ -167,7 +193,8 @@ export default function SiteDashboard() {
       const devicesBreakdownResp = await axios.get('/api/v1/stats/breakdown', {
         params: {
           site_id: siteId,
-          period: '7d',
+          period: plausibleParams.period,
+          date: plausibleParams.curDate,
           metrics: ['visitors', 'visits', 'pageviews', 'bounce_rate', 'visit_duration', 'events'].join(','),
           property: 'visit:device'
         }
@@ -182,16 +209,19 @@ export default function SiteDashboard() {
     } catch (err: any) {
       console.log(err.response.data)
     } finally {
-      setLoading(false)
+      setLoadingAggregated(false)
     }
-  }
+  }, [siteId, axios, plausibleParams])
 
-  const fetchFocusedData = async () => {
+  const fetchFocusedData = useCallback(async () => {
+    setLoadingTimeseries(true)
+
     try {
       const current = await axios.get('/api/v1/stats/timeseries', {
         params: {
           site_id: siteId,
-          period: '7d',
+          period: plausibleParams.period,
+          date: plausibleParams.curDate,
           metrics: [activeStat as string].join(','),
         }
       })
@@ -199,8 +229,8 @@ export default function SiteDashboard() {
       const prev = await axios.get('/api/v1/stats/timeseries', {
         params: {
           site_id: siteId,
-          period: '7d',
-          date: DateTime.now().minus({ days: 7 }).toFormat('yyyy-MM-dd'),
+          period: plausibleParams.period,
+          date: plausibleParams.prevDate,
           metrics: [activeStat as string].join(','),
         }
       })
@@ -219,8 +249,10 @@ export default function SiteDashboard() {
       }))
     } catch (err: any) {
       console.log(err.response.data)
+    } finally {
+      setLoadingTimeseries(false)
     }
-  }
+  }, [siteId, plausibleParams, activeStat])
 
   const maxValue = useMemo(() => {
     return Math.max(...timeseries.map(item => item.value), ...timeseriesPrev.map(item => item.value))
@@ -252,12 +284,12 @@ export default function SiteDashboard() {
   useEffect(() => {
     if (!siteId) return
     fetchData()
-  }, [siteId])
+  }, [siteId, range])
 
   useEffect(() => {
     if (!siteId) return
     fetchFocusedData()
-  }, [activeStat])
+  }, [activeStat, range])
 
   if (!siteId) {
     return (
@@ -283,9 +315,24 @@ export default function SiteDashboard() {
           //     onRefresh={refreshData}
           //   />
           // )}
-          style={{ ...style.page }}
+          style={{ ...style.page, position: 'relative' }}
         >
+          {
+            loadingAggregated || loadingTimeseries ?
+              <View style={{
+                ...StyleSheet.absoluteFillObject,
+                justifyContent: 'center',
+                alignItems: 'center',
+                zIndex: 10,
+                backgroundColor: colorScheme === 'dark' ? '#eeeeee33' : '#22222233',
+              }}>
+                <ActivityIndicator size="large" />
+              </View>
+              : null
+          }
+
           <View style={{ height: (insets?.top || 0) + 30 }} />
+
           <View style={{ rowGap: 10 }}>
             <View style={{
               flexDirection: 'row',
@@ -433,7 +480,7 @@ export default function SiteDashboard() {
             alignSelf: 'center',
             height: 8,
             width: "100%",
-            // backgroundColor: '#eee'
+            marginBottom: 10
           }}>
             <SlidingDot
               containerStyle={{
