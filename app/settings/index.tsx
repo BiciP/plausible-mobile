@@ -22,9 +22,9 @@ export default function Settings() {
   const [requests] = useAtom(requestsAtom)
 
   const handleSave = useCallback(() => {
-    if (apiKeyInput !== apiKey) setApiKey(apiKeyInput)
-    if (instanceUrl !== instance) setInstance(instanceUrl)
-  }, [apiKeyInput])
+    setApiKey(apiKeyInput)
+    setInstance(instanceUrl)
+  }, [apiKeyInput, instanceUrl])
 
   const resetInstanceURL = () => {
     let defaultUrl = "https://plausible.io"
@@ -82,9 +82,6 @@ export default function Settings() {
                   onChangeText={setInstanceUrl}
                 />
               </View>
-
-              <Text>{instance}</Text>
-              <Text>{instanceUrl}</Text>
 
               <View>
                 <RectButton
