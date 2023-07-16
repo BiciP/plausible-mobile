@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react'
-import { View, Text, useColorScheme } from 'react-native'
+import { View, Text, useColorScheme, Dimensions, Animated } from 'react-native'
 import { Stack, useSearchParams } from 'expo-router'
 import StatCard from '../../../components/StatCard'
 import { SafeAreaInsetsContext, SafeAreaView } from 'react-native-safe-area-context'
@@ -12,6 +12,10 @@ import Linear from '../../../utils/shape/linear'
 import StatSectionCard from '../../../components/StatSectionCard'
 import { createIntlCache } from 'react-intl'
 import { createIntl } from '@formatjs/intl'
+import PagerView, { PagerViewOnPageScrollEventData } from 'react-native-pager-view';
+import {
+  SlidingDot,
+} from 'react-native-animated-pagination-dots';
 
 import getCountryFlag from 'country-flag-icons/unicode'
 
@@ -57,7 +61,6 @@ interface PlausibleAggregateStats {
 
 export type PlausibleMetrics = 'visitors' | 'visits' | 'pageviews' | 'views_per_visit' | 'bounce_rate' | 'visit_duration' | 'events'
 
-
 const cache = createIntlCache()
 
 const intl = createIntl(
@@ -66,6 +69,8 @@ const intl = createIntl(
   },
   cache
 )
+
+const AnimatedPagerView = Animated.createAnimatedComponent(PagerView);
 
 export default function SiteDashboard() {
   const colorScheme = useColorScheme();
@@ -90,6 +95,19 @@ export default function SiteDashboard() {
 
   const [timeseries, setTimeseries] = React.useState<any[]>([{ value: 0, timestamp: 0 }])
   const [timeseriesPrev, setTimeseriesPrev] = React.useState<any[]>([{ value: 0, timestamp: 0 }])
+
+  const ref = React.useRef<PagerView>(null);
+  const width = Dimensions.get('window').width;
+  const scrollOffsetAnimatedValue = React.useRef(new Animated.Value(0)).current;
+  const positionAnimatedValue = React.useRef(new Animated.Value(0)).current;
+  const inputRange = [0, 4];
+  const scrollX = Animated.add(
+    scrollOffsetAnimatedValue,
+    positionAnimatedValue
+  ).interpolate({
+    inputRange,
+    outputRange: [0, 4 * width],
+  });
 
   const refreshData = async () => {
     setRefreshing(true)
@@ -212,6 +230,25 @@ export default function SiteDashboard() {
     return Math.max(1, Math.ceil(maxValue / 5))
   }, [maxValue])
 
+  const onPageScroll = React.useMemo(
+    () =>
+      Animated.event<PagerViewOnPageScrollEventData>(
+        [
+          {
+            nativeEvent: {
+              offset: scrollOffsetAnimatedValue,
+              position: positionAnimatedValue,
+            },
+          },
+        ],
+        {
+          useNativeDriver: false,
+        }
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
   useEffect(() => {
     if (!siteId) return
     fetchData()
@@ -239,13 +276,13 @@ export default function SiteDashboard() {
       />
 
       <View style={{ flex: 1 }}>
-        <ScrollView
-          refreshControl={(
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={refreshData}
-            />
-          )}
+        <View
+          // refreshControl={(
+          //   <RefreshControl
+          //     refreshing={refreshing}
+          //     onRefresh={refreshData}
+          //   />
+          // )}
           style={{ ...style.page }}
         >
           <View style={{ height: (insets?.top || 0) + 30 }} />
@@ -336,7 +373,7 @@ export default function SiteDashboard() {
             </View>
           </View>
 
-          <View style={{ marginLeft: -10, marginVertical: 20 }}>
+          <View style={{ marginLeft: -10, paddingVertical: 20 }}>
             <LineChart.Provider
               data={{
                 one: timeseries,
@@ -391,8 +428,36 @@ export default function SiteDashboard() {
             </LineChart.Provider>
           </View>
 
-          <View style={{ rowGap: 10, opacity: loading ? 0 : 1 }}>
+          <View style={{
+            justifyContent: 'center',
+            alignSelf: 'center',
+            height: 8,
+            width: "100%",
+            // backgroundColor: '#eee'
+          }}>
+            <SlidingDot
+              containerStyle={{
+                top: 0
+              }}
+              marginHorizontal={3}
+              data={[{ key: 0 }, { key: 1 }, { key: 2 }, { key: 3 }]}
+              //@ts-ignore
+              scrollX={scrollX}
+              dotSize={8}
+              dotStyle={{
+                backgroundColor: colors.primary,
+              }}
+            />
+          </View>
+
+          <AnimatedPagerView
+            ref={ref}
+            style={{ flex: 1 }}
+            onPageScroll={onPageScroll}
+            initialPage={0}
+          >
             <StatSectionCard
+              key={0}
               metric={activeStat}
               title="Top sources"
               items={sourcesBreakdown.map((item: SourcesBreakdown) => {
@@ -404,6 +469,7 @@ export default function SiteDashboard() {
             />
 
             <StatSectionCard
+              key={1}
               metric={activeStat}
               title="Top pages"
               items={pagesBreakdown.map((item: PagesBreakdown) => {
@@ -416,6 +482,7 @@ export default function SiteDashboard() {
             />
 
             <StatSectionCard
+              key={2}
               metric={activeStat}
               title="Top countries"
               items={countriesBreakdown.map((item: CountriesBreakdown) => {
@@ -430,6 +497,7 @@ export default function SiteDashboard() {
             />
 
             <StatSectionCard
+              key={3}
               metric={activeStat}
               title="Top devices"
               items={devicesBreakdown.map((item: DevicesBreakdown) => {
@@ -440,10 +508,10 @@ export default function SiteDashboard() {
               }
               )}
             />
-          </View>
+          </AnimatedPagerView>
 
-          <View style={{ height: (insets?.bottom || 0) + 20 }} />
-        </ScrollView>
+          {/* <View style={{ height: (insets?.bottom || 0) + 20 }} /> */}
+        </View>
       </View>
     </>
   )
