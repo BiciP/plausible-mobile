@@ -3,24 +3,42 @@ import TextInput from "../../components/TextInput";
 import { useColors, useStyle } from "../../hooks/useStyle";
 import { Stack } from "expo-router";
 import { View, Text, SafeAreaView, Keyboard, Linking } from "react-native";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { BorderlessButton, RectButton, TouchableWithoutFeedback } from "react-native-gesture-handler";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { requestsAtom } from "../../store";
 import URLButton from "../../components/URLButton";
+import { instanceAtom } from "../../store/instance";
 
 export default function Settings() {
   const colors = useColors()
   const style = useStyle()
+  const [instance, setInstance] = useAtom(instanceAtom)
 
-  const { apiKey, setApiKey } = useApiContext()
+  const { apiKey, baseUrl, setApiKey } = useApiContext()
   const [apiKeyInput, setApiKeyInput] = useState<string>("")
+  const [instanceUrl, setInstanceUrl] = useState<string>(baseUrl)
 
   const [requests] = useAtom(requestsAtom)
 
-  const handleSaveAPIKey = useCallback(() => {
-    setApiKey(apiKeyInput)
+  const handleSave = useCallback(() => {
+    if (apiKeyInput !== apiKey) setApiKey(apiKeyInput)
+    if (instanceUrl !== instance) setInstance(instanceUrl)
   }, [apiKeyInput])
+
+  const resetInstanceURL = () => {
+    let defaultUrl = "https://plausible.io"
+    setInstanceUrl(defaultUrl)
+    setInstance(defaultUrl)
+  }
+
+  const saveEnabled = useMemo(() => {
+    return apiKey !== apiKeyInput ||
+      instance !== instanceUrl
+  }, [
+    apiKey, apiKeyInput,
+    instance, instanceUrl
+  ])
 
   useEffect(() => {
     setApiKeyInput(apiKey || "")
@@ -37,22 +55,45 @@ export default function Settings() {
       <SafeAreaView style={{ backgroundColor: colors.background, alignItems: 'center' }}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={style.page}>
-            <View>
-              <Text style={{ color: colors.text, fontSize: 18, fontWeight: 'bold' }}>
-                API Key
-              </Text>
-              <TextInput
-                value={apiKeyInput}
-                onChangeText={setApiKeyInput}
-              />
-              <View style={{ marginTop: 10 }}>
+            <View style={{ rowGap: 15 }}>
+              <View>
+                <Text style={{ color: colors.text, fontSize: 18, fontWeight: 'bold' }}>
+                  API Key
+                </Text>
+                <TextInput
+                  value={apiKeyInput}
+                  onChangeText={setApiKeyInput}
+                />
+              </View>
+
+              <View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Text style={{ color: colors.text, fontSize: 18, fontWeight: 'bold' }}>
+                    Instance URL
+                  </Text>
+                  <BorderlessButton onPress={resetInstanceURL}>
+                    <Text style={{ color: colors.primary }}>
+                      Reset
+                    </Text>
+                  </BorderlessButton>
+                </View>
+                <TextInput
+                  value={instanceUrl}
+                  onChangeText={setInstanceUrl}
+                />
+              </View>
+
+              <Text>{instance}</Text>
+              <Text>{instanceUrl}</Text>
+
+              <View>
                 <RectButton
-                  onPress={handleSaveAPIKey}
+                  onPress={handleSave}
                   style={{
                     ...style.primaryButton,
-                    opacity: apiKey === apiKeyInput ? .5 : 1
+                    opacity: saveEnabled ? 1 : .5
                   }}
-                  enabled={apiKey !== apiKeyInput}
+                  enabled={saveEnabled}
                 >
                   <Text style={style.primaryButtonText}>
                     Save API Key

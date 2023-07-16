@@ -3,6 +3,8 @@ import * as SecureStore from 'expo-secure-store';
 import { SplashScreen, useRouter } from "expo-router";
 
 import CONSTANTS from "../utils/constants";
+import { useAtomValue } from "jotai";
+import { instanceAtom } from "../store/instance";
 
 type ApiContextType = {
   apiKey: string | null;
@@ -18,6 +20,7 @@ export const useApiContext = () => {
 
 export const ApiProvider: React.FC<any> = ({ children }) => {
   const router = useRouter();
+  const instance = useAtomValue(instanceAtom)
 
   const [ready, setReady] = React.useState(false);
   const [apiKey, setApiKey] = React.useState<string | null>(null);
@@ -61,7 +64,7 @@ export const ApiProvider: React.FC<any> = ({ children }) => {
         value={{
           apiKey,
           setApiKey: saveApiKey,
-          baseUrl: "https://plausible.io"
+          baseUrl: instance || "https://plausible.io"
         }}>
         {children}
       </ApiContext.Provider>

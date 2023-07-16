@@ -20,7 +20,7 @@ import { useAtom } from "jotai";
 import { pagesAtom } from "../store";
 
 export default function Index() {
-  const { apiKey } = useApiContext()
+  const { apiKey, baseUrl } = useApiContext()
   const insets = React.useContext(SafeAreaInsetsContext);
   const colorScheme = useColorScheme()
   const windowDimensions = useWindowDimensions()
