@@ -19,10 +19,6 @@ import SiteCard from "../components/SiteCard";
 import { useAtom } from "jotai";
 import { pagesAtom } from "../store";
 
-function invokeHaptic() {
-  haptics.impactAsync(haptics.ImpactFeedbackStyle.Light);
-}
-
 export default function Index() {
   const { apiKey } = useApiContext()
   const insets = React.useContext(SafeAreaInsetsContext);
@@ -153,7 +149,10 @@ export default function Index() {
           </View>
 
           <AddWebsite
-            onAdd={(site) => { }}
+            onAdd={async () => {
+              const sites = await getSites()
+              setSites(sites)
+            }}
           />
         </View>
       </SafeAreaView>

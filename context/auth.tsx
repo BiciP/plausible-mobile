@@ -24,6 +24,7 @@ export const ApiProvider: React.FC<any> = ({ children }) => {
 
   const loadApiKey = async () => {
     try {
+      // await SecureStore.deleteItemAsync(CONSTANTS.SECURE_STORAGE.API_KEY)
       const key = await SecureStore.getItemAsync(CONSTANTS.SECURE_STORAGE.API_KEY)
       // const key = null;
       if (key) {
@@ -42,6 +43,7 @@ export const ApiProvider: React.FC<any> = ({ children }) => {
   const saveApiKey = async (apiKey: string) => {
     await SecureStore.setItemAsync(CONSTANTS.SECURE_STORAGE.API_KEY, apiKey)
     setApiKey(apiKey)
+    await router.push("/")
   }
 
   React.useEffect(() => {

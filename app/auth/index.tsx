@@ -28,11 +28,6 @@ export default function Auth() {
     setApiKey(apiKeyInput)
   }
 
-  if (apiKey != null) {
-    router.push("/")
-    return null
-  }
-
   return (
     <>
       <Stack.Screen

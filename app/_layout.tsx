@@ -12,6 +12,7 @@ import { BorderlessButton, RectButton, ScrollView } from "react-native-gesture-h
 
 import { ApiProvider } from "../context/auth";
 import { useColors } from "../hooks/useStyle";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const cacheFonts = (fonts: any) => fonts.map((font: any) => Font.loadAsync(font));
 
@@ -31,6 +32,8 @@ export default function AppLayout() {
   React.useEffect(() => {
     async function loadResourcesAndDataAsync() {
       try {
+        // await AsyncStorage.clear() // lunagpt.io
+
         SplashScreen.preventAutoHideAsync();
 
         const imageAssets = cacheImages([
