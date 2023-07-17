@@ -6,10 +6,12 @@ import { PulseIndicator } from "react-native-indicators";
 import { LineChart, TLineChartData } from "react-native-wagmi-charts";
 import { useColors, useStyle } from "../hooks/useStyle";
 import Linear from '../utils/shape/linear'
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const GRAPH_HEIGHT = 120
 
 interface SiteDataCompact {
+  error?: boolean
   live: number
   last24h: number
   current: TLineChartData
@@ -31,8 +33,9 @@ export default function SiteCard({ origin, siteData }: SiteCardProps) {
 
   return (
     <Card
-      as={BorderlessButton}
+      as={siteData.error ? View : BorderlessButton}
       onPress={() => {
+        if (siteData.error) return
         router.push(`/sites/${origin}`)
       }}
     >
@@ -46,14 +49,27 @@ export default function SiteCard({ origin, siteData }: SiteCardProps) {
         }}
       >
         <View>
-          <Text style={{
-            color: colors.text,
-            fontWeight: 'bold',
-            fontSize: 18,
-            marginBottom: 5,
-          }}>
-            {origin}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 5 }}>
+            <Text style={{
+              color: colors.text,
+              fontWeight: 'bold',
+              fontSize: 18,
+              marginBottom: 5,
+            }}>
+              {origin}
+            </Text>
+
+            {
+              siteData.error ?
+                <View style={{ flexDirection: 'row', marginBottom: 5, alignItems: 'center' }} >
+                  <Ionicons name='alert-circle' size={18} color={colors.danger} />
+                  <Text style={{ color: colors.danger }}>
+                    Could not fetch site data
+                  </Text>
+                </View>
+                : null
+            }
+          </View>
 
           <Text>
             <Text style={{ fontWeight: 'bold' }}>{siteData.last24h}</Text> visitors in last 24h

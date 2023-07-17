@@ -108,7 +108,9 @@ export default function Index() {
       } catch(err) {
         console.log(err)
         siteData[site] = {
+          error: true,
           live: 0,
+          last24h: '-',
           current: [{ timestamp: 0, value: 0 }],
           previous: [{ timestamp: 0, value: 0}],
         }
@@ -121,7 +123,7 @@ export default function Index() {
   useEffect(() => {
     if (!apiKey) return
     fetchhSites()
-  }, [sites, apiKey])
+  }, [sites, apiKey, baseUrl])
 
   useInterval(() => {
     fetchhSites()
