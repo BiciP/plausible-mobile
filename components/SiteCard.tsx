@@ -11,6 +11,7 @@ const GRAPH_HEIGHT = 120
 
 interface SiteDataCompact {
   live: number
+  last24h: number
   current: TLineChartData
   previous: TLineChartData
 }
@@ -37,19 +38,27 @@ export default function SiteCard({ origin, siteData }: SiteCardProps) {
     >
       <View
         style={{
-          paddingTop: 20,
+          paddingTop: 15,
           paddingHorizontal: 20,
           paddingBottom: 10,
           flexDirection: 'row',
           justifyContent: 'space-between',
         }}
       >
-        <Text style={{
-          color: colors.text,
-          fontSize: 18,
-        }}>
-          {origin}
-        </Text>
+        <View>
+          <Text style={{
+            color: colors.text,
+            fontWeight: 'bold',
+            fontSize: 18,
+            marginBottom: 5,
+          }}>
+            {origin}
+          </Text>
+
+          <Text>
+            <Text style={{ fontWeight: 'bold' }}>{siteData.last24h}</Text> visitors in last 24h
+          </Text>
+        </View>
 
         <View style={{
           flexDirection: 'row',

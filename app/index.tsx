@@ -59,8 +59,39 @@ export default function Index() {
           }
         })
 
+        const today = await axios.get('/api/v1/stats/timeseries', {
+          params: {
+            site_id: site,
+            period: 'day',
+          }
+        })
+
+        const yesterday = await axios.get('/api/v1/stats/timeseries', {
+          params: {
+            site_id: site,
+            period: 'day',
+            date: DateTime.now().minus({ days: 1 }).toFormat('yyyy-MM-dd'),
+          }
+        })
+
+        let last24h = 0
+        let last24hCutoff = DateTime.now().minus({ hours: 24 }).toUnixInteger() * 1000
+        let todayData = today.data.results
+        let yesterdayData = yesterday.data.results
+
+        for (let datapoint of todayData) {
+          last24h += datapoint.visitors
+        }
+
+        for (let datapoint of yesterdayData) {
+          let date = new Date(datapoint.date).getTime()
+          if (date < last24hCutoff) continue
+          last24h += datapoint.visitors
+        }
+
         siteData[site] = {
           live: live.data,
+          last24h,
           current: res.data.results.map((result: any) => {
             return {
               timestamp: new Date(result.date).getTime(),
