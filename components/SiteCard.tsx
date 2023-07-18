@@ -71,7 +71,7 @@ export default function SiteCard({ origin, siteData }: SiteCardProps) {
             }
           </View>
 
-          <Text>
+          <Text style={{ color: colors.text }}>
             <Text style={{ fontWeight: 'bold' }}>{siteData.last24h}</Text> visitors in last 24h
           </Text>
         </View>
