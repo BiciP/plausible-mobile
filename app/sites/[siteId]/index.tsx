@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo } from 'react'
 import { View, Text, useColorScheme, Dimensions, Animated, ActivityIndicator, StyleSheet } from 'react-native'
 import { Stack, useSearchParams } from 'expo-router'
 import StatCard from '../../../components/StatCard'
-import { SafeAreaInsetsContext, SafeAreaView } from 'react-native-safe-area-context'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useColors, useStyle } from '../../../hooks/useStyle'
 import { BorderlessButton, RefreshControl, ScrollView } from 'react-native-gesture-handler'
 import { useAxios } from '../../../hooks/useAxios'
@@ -82,7 +82,7 @@ export default function SiteDashboard() {
   const colors = useColors()
   const style = useStyle()
   const axios = useAxios()
-  const insets = React.useContext(SafeAreaInsetsContext)
+  const insets = useSafeAreaInsets()
 
   const { siteId } = useSearchParams()
 
@@ -315,7 +315,7 @@ export default function SiteDashboard() {
           //     onRefresh={refreshData}
           //   />
           // )}
-          style={{ ...style.page, position: 'relative' }}
+          style={{ ...style.page, position: 'relative', paddingVertical: 10 }}
         >
           {
             loadingAggregated || loadingTimeseries ?
@@ -331,7 +331,7 @@ export default function SiteDashboard() {
               : null
           }
 
-          <View style={{ height: (insets?.top || 0) + 30 }} />
+          <View style={{ height: (insets?.top || 0) + 43 }} />
 
           <View style={{ rowGap: 10 }}>
             <View style={{
@@ -507,57 +507,81 @@ export default function SiteDashboard() {
               key={0}
               metric={activeStat}
               title="Top sources"
-              items={sourcesBreakdown.map((item: SourcesBreakdown) => {
-                return {
-                  title: item.source,
-                  value: item[activeStat as string],
-                }
-              })}
+              items={
+                sourcesBreakdown
+                  .sort((a, b) => {
+                    return (b[activeStat as string] || 0) - (a[activeStat as string] || 0)
+                  })
+                  .map((item: SourcesBreakdown) => {
+                    return {
+                      title: item.source,
+                      value: item[activeStat as string],
+                    }
+                  })
+              }
             />
 
             <StatSectionCard
               key={1}
               metric={activeStat}
               title="Top pages"
-              items={pagesBreakdown.map((item: PagesBreakdown) => {
-                return {
-                  title: item.page,
-                  value: item[activeStat as string],
-                }
+              items={
+                pagesBreakdown
+                  .sort((a, b) => {
+                    return (b[activeStat as string] || 0) - (a[activeStat as string] || 0)
+                  })
+                  .map((item: PagesBreakdown) => {
+                    return {
+                      title: item.page,
+                      value: item[activeStat as string],
+                    }
+                  }
+                  )
               }
-              )}
             />
 
             <StatSectionCard
               key={2}
               metric={activeStat}
               title="Top countries"
-              items={countriesBreakdown.map((item: CountriesBreakdown) => {
-                return {
-                  // @ts-ignore
-                  icon: getCountryFlag(item.country),
-                  title: intl.formatDisplayName(item.country, { type: 'region' }) || item.country,
-                  value: item[activeStat as string],
-                }
+              items={
+                countriesBreakdown
+                  .sort((a, b) => {
+                    return (b[activeStat as string] || 0) - (a[activeStat as string] || 0)
+                  })
+                  .map((item: CountriesBreakdown) => {
+                    return {
+                      // @ts-ignore
+                      icon: getCountryFlag(item.country),
+                      title: intl.formatDisplayName(item.country, { type: 'region' }) || item.country,
+                      value: item[activeStat as string],
+                    }
+                  }
+                  )
               }
-              )}
             />
 
             <StatSectionCard
               key={3}
               metric={activeStat}
               title="Top devices"
-              items={devicesBreakdown.map((item: DevicesBreakdown) => {
-                return {
-                  title: item.device,
-                  value: item[activeStat as string],
-                }
+              items={
+                devicesBreakdown
+                  .sort((a, b) => {
+                    return (b[activeStat as string] || 0) - (a[activeStat as string] || 0)
+                  })
+                  .map((item: DevicesBreakdown) => {
+                    return {
+                      title: item.device,
+                      value: item[activeStat as string],
+                    }
+                  }
+                  )
               }
-              )}
             />
           </AnimatedPagerView>
 
-          {/* <View style={{ height: (insets?.bottom || 0) + 20 }} /> */}
+          <View style={{ height: (insets?.bottom || 0) }} />
         </View>
       </View>
     </>
