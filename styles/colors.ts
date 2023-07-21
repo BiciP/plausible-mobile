@@ -1,6 +1,6 @@
 export const lightColorsPallete = {
   background: "#fff",
-  secondaryBackground: "#fff", // used for cards, modal, etc -> can be white in light mode as we use shadows to differentiate
+  secondaryBackground: "#fafafa", // used for cards, modal, etc -> can be white in light mode as we use shadows to differentiate
   text: "#1f2937",
   primary: "#4f46e5",
   danger: "#dc2626",
