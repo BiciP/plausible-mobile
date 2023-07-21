@@ -1,6 +1,6 @@
 {
   "name": "plausible-app",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "index.js",
   "scripts": {
     "start": "expo start",
@@ -36,6 +36,7 @@
     "expo-secure-store": "~12.1.1",
     "expo-status-bar": "~1.4.4",
     "expo-system-ui": "~2.2.1",
+    "expo-updates": "~0.16.4",
     "jotai": "^2.2.2",
     "luxon": "^3.3.0",
     "numbro": "^2.3.6",

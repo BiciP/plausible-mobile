@@ -1,6 +1,6 @@
 import React from "react";
 import { Stack } from "expo-router";
-import { SafeAreaView, SafeAreaInsetsContext } from "react-native-safe-area-context";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { View, Image, Text, Platform } from "react-native";
 import * as Font from 'expo-font';
@@ -24,7 +24,6 @@ const cacheImages = (images: any) => images.map((image: any) => {
 })
 
 export default function AppLayout() {
-  const insets = React.useContext(SafeAreaInsetsContext);
   const [appReady, setAppReady] = React.useState(false);
   const colors = useColors()
 
@@ -56,22 +55,24 @@ export default function AppLayout() {
   }, [])
 
   return (
-    <ApiProvider>
-      <BottomSheetModalProvider>
-        <StatusBar />
+    <SafeAreaProvider>
+      <ApiProvider>
+        <BottomSheetModalProvider>
+          <StatusBar />
 
-        <Stack
-          screenOptions={{
-            headerTransparent: true,
-            headerBlurEffect: 'systemUltraThinMaterial',
-            headerTintColor: colors.text,
-            headerRight: RangePicker
-          }}
-          initialRouteName="index"
-        />
+          <Stack
+            screenOptions={{
+              headerTransparent: true,
+              headerBlurEffect: 'systemUltraThinMaterial',
+              headerTintColor: colors.text,
+              headerRight: RangePicker
+            }}
+            initialRouteName="index"
+          />
 
-        <RangeModal />
-      </BottomSheetModalProvider>
-    </ApiProvider>
+          <RangeModal />
+        </BottomSheetModalProvider>
+      </ApiProvider>
+    </SafeAreaProvider>
   );
 }

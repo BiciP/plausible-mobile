@@ -20,14 +20,7 @@ export default function Card({ as, children, ...props }: CardProps) {
       {...props}
       style={{
         backgroundColor: colors.secondaryBackground,
-        borderRadius: 10,
-
-        ...(
-          colorScheme === 'light' ?
-            props.shadow || style.shadowMd
-            : null
-        ),
-        
+        borderRadius: 4,
         ...props.style,
       }}
     >

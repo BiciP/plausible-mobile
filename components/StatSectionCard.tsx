@@ -24,7 +24,7 @@ export default function StatSectionCard({ metric, title, items }: StatSectionCar
   const totalValue = metric === 'bounce_rate' ? 100 : items.reduce((acc, item) => acc + item.value, 0)
 
   return (
-    <Card style={{ flex: 1, padding: 10 }} collapsible={false} shadow={{}}>
+    <Card style={{ flex: 1, padding: 10, backgroundColor: colors.background }} collapsible={false} shadow={{}}>
       <View style={{ marginBottom: 10 }}>
         <Text style={{ ...style.title, fontSize: 18 }}>
           {title}

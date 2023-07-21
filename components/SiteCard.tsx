@@ -38,12 +38,15 @@ export default function SiteCard({ origin, siteData }: SiteCardProps) {
         if (siteData.error) return
         router.push(`/sites/${origin}`)
       }}
+      style={{
+        paddingBottom: 0
+      }}
     >
       <View
         style={{
           paddingTop: 15,
           paddingHorizontal: 20,
-          paddingBottom: 10,
+          paddingBottom: 5,
           flexDirection: 'row',
           justifyContent: 'space-between',
         }}
@@ -71,7 +74,7 @@ export default function SiteCard({ origin, siteData }: SiteCardProps) {
             }
           </View>
 
-          <Text>
+          <Text style={{ color: colors.text }}>
             <Text style={{ fontWeight: 'bold' }}>{siteData.last24h}</Text> visitors in last 24h
           </Text>
         </View>
@@ -123,17 +126,6 @@ export default function SiteCard({ origin, siteData }: SiteCardProps) {
             >
               <LineChart.Group>
                 <LineChart
-                  id="two"
-                  height={GRAPH_HEIGHT}
-                  width={windowDimensions.width - 20}
-                  shape={Linear}
-                >
-                  <LineChart.Path
-                    width={2}
-                    color={'#888'}
-                  />
-                </LineChart>
-                <LineChart
                   id="one"
                   height={GRAPH_HEIGHT}
                   width={windowDimensions.width - 20}
@@ -142,7 +134,9 @@ export default function SiteCard({ origin, siteData }: SiteCardProps) {
                   <LineChart.Path
                     width={2}
                     color={colors.primary}
-                  />
+                  >
+                    <LineChart.Gradient />
+                  </LineChart.Path>
                 </LineChart>
               </LineChart.Group>
             </LineChart.Provider>

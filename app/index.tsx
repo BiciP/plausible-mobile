@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, Stack, useRouter } from "expo-router";
 import { View, Text, Pressable, StyleSheet, Platform, useColorScheme, useWindowDimensions } from "react-native";
-import { SafeAreaView, SafeAreaInsetsContext } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BorderlessButton, FlatList, RectButton } from "react-native-gesture-handler";
 import { LineChart } from 'react-native-wagmi-charts';
 import * as haptics from 'expo-haptics';
@@ -21,7 +21,7 @@ import { pagesAtom } from "../store";
 
 export default function Index() {
   const { apiKey, baseUrl } = useApiContext()
-  const insets = React.useContext(SafeAreaInsetsContext);
+  const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme()
   const windowDimensions = useWindowDimensions()
   const router = useRouter();
@@ -41,15 +41,7 @@ export default function Index() {
         const res = await axios.get('/api/v1/stats/timeseries', {
           params: {
             site_id: site,
-            period: '7d',
-          }
-        })
-
-        const prev = await axios.get('/api/v1/stats/timeseries', {
-          params: {
-            site_id: site,
-            period: '7d',
-            date: DateTime.now().minus({ days: 7 }).toFormat('yyyy-MM-dd')
+            period: '30d',
           }
         })
 
@@ -98,21 +90,16 @@ export default function Index() {
               value: result.visitors,
             }
           }),
-          previous: prev.data.results.map((result: any) => {
-            return {
-              timestamp: new Date(result.date).getTime(),
-              value: result.visitors,
-            }
-          })
+          previous: []
         }
-      } catch(err) {
+      } catch (err) {
         console.log(err)
         siteData[site] = {
           error: true,
           live: 0,
           last24h: '-',
           current: [{ timestamp: 0, value: 0 }],
-          previous: [{ timestamp: 0, value: 0}],
+          previous: [{ timestamp: 0, value: 0 }],
         }
       }
     }
@@ -155,8 +142,9 @@ export default function Index() {
         }}
       />
 
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-        <View style={{ ...style.page, marginTop: 20 }}>
+      {/* TODO: This 43 number is very odd, but it works :) */}
+      <View style={{ flex: 1, backgroundColor: colors.background, paddingTop: insets.top + 43 }}>
+        <View style={{ ...style.page, paddingVertical: 0 }}>
           <View style={{
             marginHorizontal: -20,
             flex: 1,
@@ -188,7 +176,7 @@ export default function Index() {
             }}
           />
         </View>
-      </SafeAreaView>
+      </View>
     </>
   )
 }

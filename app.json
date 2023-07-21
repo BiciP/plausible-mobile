@@ -2,7 +2,7 @@
   "expo": {
     "name": "Staat",
     "slug": "plausible-app",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -25,7 +25,7 @@
         }
       },
       "bundleIdentifier": "com.bicip.plausibleapp",
-      "buildNumber": "5"
+      "buildNumber": "6"
     },
     "android": {
       "adaptiveIcon": {
@@ -55,6 +55,12 @@
       "eas": {
         "projectId": "11f2d76a-dfcc-4973-9f13-27a7ace7579a"
       }
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/11f2d76a-dfcc-4973-9f13-27a7ace7579a"
     }
   }
 }
