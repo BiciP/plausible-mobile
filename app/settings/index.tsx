@@ -119,6 +119,10 @@ export default function Settings() {
               </Text>
             </View>
 
+            <View style={{ marginTop: 20 }}>
+              
+            </View>
+
             <BorderlessButton
               style={{
                 backgroundColor: "#FD0",
