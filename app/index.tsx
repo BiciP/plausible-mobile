@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 import { Link, Stack, useRouter } from "expo-router";
+import { useHeaderHeight } from "@react-navigation/elements";
 import {
   View,
   Text,
@@ -39,6 +40,8 @@ import SiteCard from "../components/SiteCard";
 import { useAtom } from "jotai";
 import { pagesAtom } from "../store";
 import SVG, { Line } from "react-native-svg";
+import { preferencesAtom } from "../store/preferences";
+import { useTimeoutInterval } from "../hooks/useTimeout";
 
 export default function Index() {
   const refreshInterval = 1000 * 60;
@@ -51,27 +54,20 @@ export default function Index() {
   const colors = useColors();
   const style = useStyle();
   const axios = useAxios();
+  const headerHeight = useHeaderHeight();
+
+  const [pages, setPages] = useAtom(pagesAtom);
+  const [preferences, setPreferences] = useAtom(preferencesAtom);
 
   const [sites, setSites] = useState<string[]>([]);
-  const [pages, setPages] = useAtom(pagesAtom);
   const [reloading, setReloading] = useState<boolean>(false);
+  const [lastFetch, setLastFetch] = useState<number | null>(null);
 
   const barWidth = useRef(new Animated.Value(0)).current;
   const progressPercent = barWidth.interpolate({
     inputRange: [0, 100],
     outputRange: ["0%", `100%`],
   });
-
-  const refreshTiemout = () => {
-    let to = setTimeout(fetchhSites, refreshInterval);
-    barWidth.setValue(0);
-    Animated.timing(barWidth, {
-      toValue: 100,
-      duration: refreshInterval,
-      useNativeDriver: false,
-      easing: Easing.linear,
-    }).start();
-  };
 
   const fetchhSites = async () => {
     setReloading(true);
@@ -144,22 +140,32 @@ export default function Index() {
           previous: [{ timestamp: 0, value: 0 }],
         };
       }
-
-      setReloading(false);
-      refreshTiemout();
     }
 
     setPages(siteData);
+    setReloading(false);
+
+    setLastFetch(Date.now());
+    barWidth.setValue(0);
+    Animated.timing(barWidth, {
+      toValue: 100,
+      duration: preferences.refreshTime,
+      useNativeDriver: false,
+      easing: Easing.linear,
+    }).start();
   };
 
   useEffect(() => {
-    if (!apiKey) return;
+    if (!apiKey || preferences == null) return;
+    setLastFetch(null);
     fetchhSites();
-  }, [sites, apiKey, baseUrl]);
+  }, [sites, apiKey, baseUrl, preferences]);
 
-  // useInterval(() => {
-  //   fetchhSites();
-  // }, 1000 * 60 * 1);
+  useEffect(() => {
+    if (!apiKey || preferences?.refreshTime == null || !lastFetch) return;
+    const timeout = setTimeout(fetchhSites, preferences.refreshTime);
+    return () => clearTimeout(timeout);
+  }, [sites, apiKey, preferences, lastFetch]);
 
   useEffect(() => {
     (async () => {
@@ -189,12 +195,11 @@ export default function Index() {
         }}
       />
 
-      {/* TODO: This 43 number is very odd, but it works :) */}
       <View
         style={{
           flex: 1,
           backgroundColor: colors.background,
-          paddingTop: insets.top + 43,
+          paddingTop: headerHeight,
         }}
       >
         <View style={{ height: 3 }}>
@@ -207,8 +212,6 @@ export default function Index() {
           ></Animated.View>
         </View>
 
-        <Text>{reloading ? "rel" : "no-rel"}</Text>
-
         <View style={{ ...style.page, paddingVertical: 0 }}>
           <View
             style={{
@@ -217,9 +220,6 @@ export default function Index() {
             }}
           >
             <FlatList
-              onRefresh={() => {
-                // TODO: implement refreshing
-              }}
               data={sites}
               style={{
                 paddingHorizontal: 20,
